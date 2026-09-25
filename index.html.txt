@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MK Trade CRM System</title>
+    <!-- Stable Styling Baseline -->
+    <link href="https://jsdelivr.net" rel="stylesheet">
+    <style>
+        .tab-content { display: block; }
+        .tab-content.hidden { display: none; }
+        /* Fixed Modal Popup Style to guarantee it shows upfront over browser security */
+        .custom-modal { display: none; position: fixed; inset: 0; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center; z-index: 99999; }
+    </style>
+</head>
+<body class="bg-gray-50 font-sans antialiased">
+
+    <!-- TOP NAVIGATION BAR -->
+    <nav class="bg-blue-600 text-white shadow-md px-6 py-4 flex justify-between items-center">
+        <h1 class="text-xl font-bold">MK Trade Corporation CRM</h1>
+        <div id="current-date" class="text-sm bg-blue-700 px-3 py-1 rounded"></div>
+    </nav>
+
+    <div class="flex min-h-screen">
+        <!-- SIDEBAR NAVIGATION -->
+        <aside class="w-64 bg-white shadow-md flex flex-col p-4 gap-2 border-r border-gray-200">
+            <button onclick="switchTab('contacts')" class="nav-btn w-full text-left px-4 py-3 rounded-lg bg-blue-50 text-blue-600 font-semibold transition" id="btn-contacts">
+                Client Contacts
+            </button>
+            <button onclick="switchTab('quotations')" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 font-semibold transition" id="btn-quotations">
+                Quotation Maker
+            </button>
+            <button onclick="switchTab('invoices')" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 font-semibold transition" id="btn-invoices">
+                Invoice Maker
+            </button>
+            <button onclick="switchTab('challans')" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 font-semibold transition" id="btn-challans">
+                Challan Maker
+            </button>
+            <button onclick="switchTab('archive')" class="nav-btn w-full text-left px-4 py-3 rounded-lg text-gray-600 hover:bg-gray-100 font-semibold transition" id="btn-archive">
+                Permanent Archive
+            </button>
+        </aside>
+
+        <!-- MAIN CONTENT AREA -->
+        <main class="flex-1 p-8">
+            
+            <!-- SECTION 1: CLIENT CONTACTS -->
+            <section id="sec-contacts" class="tab-content">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-2xl font-bold text-gray-800">Client Contact Database</h2>
+                    <!-- Bulletproof Direct CSS Trigger for the Button -->
+                    <button onclick="document.getElementById('contact-modal').style.display='flex';" class="bg-blue-600 text-white px-5 py-2 rounded-lg hover:bg-blue-700 font-semibold shadow">+ Add Contact</button>
+                </div>
+                <div class="bg-white rounded-xl shadow overflow-hidden border border-gray-200">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="bg-gray-100 border-b border-gray-200 text-gray-700 font-semibold">
+                            <tr>
+                                <th class="p-4">Company Name</th>
+                                <th class="p-4">Contact Person</th>
+                                <th class="p-4">Designation</th>
+                                <th class="p-4">Mobile</th>
+                                <th class="p-4">Email</th>
+                                <th class="p-4">Address</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contacts-table-body" class="text-gray-600 divide-y divide-gray-100">
+                            <tr><td colspan="6" class="p-4 text-center text-gray-400">Loading client profiles from cloud database...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- SECTION 2: QUOTATION MAKER -->
+            <section id="sec-quotations" class="tab-content hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Create New Quotation</h2>
+                <div class="bg-white p-6 rounded-xl shadow border border-gray-200 grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Select Client</label>
+                        <select id="q-client" class="w-full border border-gray-300 rounded-lg p-2.5 bg-white"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Validity Date</label>
+                        <input type="date" id="q-validity" class="w-full border border-gray-300 rounded-lg p-2.5">
+                    </div>
+                    <div class="col-span-2 border-t border-gray-100 pt-4 mt-2">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Item Details</h3>
+                        <div id="quotation-items" class="flex flex-col gap-3">
+                            <div class="flex gap-2 item-row">
+                                <input type="text" placeholder="Item Name / Model" class="flex-1 border border-gray-300 rounded-lg p-2" required>
+                                <input type="number" placeholder="Qty" class="w-20 border border-gray-300 rounded-lg p-2" required>
+                                <input type="number" placeholder="Unit Price" class="w-32 border border-gray-300 rounded-lg p-2" required>
+                            </div>
+                        </div>
+                        <button onclick="addItemRow('quotation-items', true)" class="mt-3 text-sm text-blue-600 font-semibold hover:underline">+ Add Another Item</button>
+                    </div>
+                    <div class="col-span-2 flex justify-end gap-3 mt-6">
+                        <button onclick="generateDocument('quotations')" class="bg-green-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-green-700 transition">Save & Archive Quotation</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 3: INVOICE MAKER -->
+            <section id="sec-invoices" class="tab-content hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Create New Invoice</h2>
+                <div class="bg-white p-6 rounded-xl shadow border border-gray-200 grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Select Client</label>
+                        <select id="i-client" class="w-full border border-gray-300 rounded-lg p-2.5 bg-white"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Paid Amount (BDT)</label>
+                        <input type="number" id="i-paid" placeholder="0.00" class="w-full border border-gray-300 rounded-lg p-2.5">
+                    </div>
+                    <div class="col-span-2 border-t border-gray-100 pt-4 mt-2">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Item Details</h3>
+                        <div id="invoice-items" class="flex flex-col gap-3">
+                            <div class="flex gap-2 item-row">
+                                <input type="text" placeholder="Item Name / Model" class="flex-1 border border-gray-300 rounded-lg p-2" required>
+                                <input type="number" placeholder="Qty" class="w-20 border border-gray-300 rounded-lg p-2" required>
+                                <input type="number" placeholder="Unit Price" class="w-32 border border-gray-300 rounded-lg p-2" required>
+                            </div>
+                        </div>
+                        <button onclick="addItemRow('invoice-items', true)" class="mt-3 text-sm text-blue-600 font-semibold hover:underline">+ Add Another Item</button>
+                    </div>
+                    <div class="col-span-2 flex justify-end gap-3 mt-6">
+                        <button onclick="generateDocument('invoices')" class="bg-blue-600 text-white px-6 py-2.5 rounded-lg font-medium hover:bg-blue-700 transition">Save & Archive Invoice</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- SECTION 4: CHALLAN MAKER -->
+            <section id="sec-challans" class="tab-content hidden">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6">Create New Challan / Delivery Slip</h2>
+                <div class="bg-white p-6 rounded-xl shadow border border-gray-200 grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Select Client</label>
+                        <select id="ch-client" class="w-full border border-gray-300 rounded-lg p-2.5 bg-white"></select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Vehicle / Transport Number</label>
+                        <input type="text" id="ch-vehicle" placeholder="e.g. Dhaka Metro-11-2233" class="w-full border border-gray-300 rounded-lg p-2.5">
+                    </div>
+                    <div class="col-span-2 border-t border-gray-100 pt-4 mt-2">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-3">Item Details</h3>
+                        <div id="challan-items" class="flex flex-col gap-3">
+                            <div class="flex gap-2 item-row">
